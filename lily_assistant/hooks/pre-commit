@@ -1,0 +1,7 @@
+#!/bin/sh
+
+lily_assistant is_virtualenv && \
+lily_assistant has_correct_structure && \
+lily_assistant is_not_master && \
+make lint && \
+make test_unit_all
