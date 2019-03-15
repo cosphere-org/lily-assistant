@@ -149,7 +149,7 @@ class CopierTestCase(TestCase):
         Copier().copy_makefile(str('gigly'))
 
         result_makefile_content = (
-            self.project_dir.join('lily_assistant.makefile').read())
+            self.project_dir.join('.lily/lily_assistant.makefile').read())
         assert result_makefile_content == textwrap.dedent(f'''
             ## GENERATED FOR VERSION: {__version__}
 
@@ -166,7 +166,7 @@ class CopierTestCase(TestCase):
         makefile = self.lily_assistant_dir.join('lily_assistant.makefile')
         makefile.write('NEW make it')
         self.mocker.patch.object(settings, 'MAKEFILE_PATH', str(makefile))
-        self.project_dir,mkdir('.lily')
+        self.project_dir.mkdir('.lily')
         self.project_dir.join(
             '.lily/lily_assistant.makefile').write('OLD make it')
 
