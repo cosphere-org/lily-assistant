@@ -16,7 +16,7 @@ VERSION := $(shell python setup.py --version)
 
 CHROME_EXISTS := $(shell command -v google-chrome)
 
-TEST_COVERAGE_THRESHOLD := 60
+TEST_COVERAGE_THRESHOLD := 90
 
 #
 # TEST LIFECYCLE TARGETS
