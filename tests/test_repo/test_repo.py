@@ -104,7 +104,9 @@ class RepoTestCase(TestCase):
 
         r.commit('hello world')
 
-        assert git.call_args_list == [call('commit -m "hello world"')]
+        assert git.call_args_list == [
+            call('commit --no-verify -m "hello world"'),
+        ]
 
     def test_git(self):
         execute = self.mocker.patch.object(Repo, 'execute')

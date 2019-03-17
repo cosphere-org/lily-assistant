@@ -53,7 +53,7 @@ class Repo:
         self.git(f'add {path}')
 
     def commit(self, message):
-        self.git(f'commit -m "{message}"')
+        self.git(f'commit --no-verify -m "{message}"')
 
     def git(self, command):
         return self.execute(f'git {command}')
