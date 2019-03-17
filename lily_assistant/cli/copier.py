@@ -5,7 +5,7 @@ import shutil
 
 import click
 
-from lily_assistant import settings, __version__
+from lily_assistant.config import Config
 
 
 class Copier:
@@ -18,11 +18,16 @@ class Copier:
 
     def copy(self, src_dir):
 
-        # -- copy hooks
+        self.create_empty_config(src_dir)
+
         self.copy_hooks()
 
-        # -- copy Makefile
         self.copy_makefile(src_dir)
+
+    def create_empty_config(self, src_dir):
+
+        if not Config.exists():
+            Config.create_empty(src_dir)
 
     def copy_hooks(self):
 
@@ -37,7 +42,7 @@ class Copier:
                 'it seems that you\'ve executed not from the root of the '
                 'project.')
 
-        shutil.copytree(settings.HOOKS_DIR, copy_hooks_dir)
+        shutil.copytree(self.base_hooks_path, copy_hooks_dir)
 
         click.secho(
             'copied git hooks to {copy_hooks_dir}'.format(
@@ -46,15 +51,12 @@ class Copier:
 
     def copy_makefile(self, src_dir):
 
-        current_version = __version__
+        config = Config()
 
-        with open(settings.MAKEFILE_PATH, 'r') as makefile:
+        with open(self.base_makefile_path, 'r') as makefile:
             content = makefile.read()
             content = re.sub(r'{%\s*SRC_DIR\s*%}', src_dir, content)
-            content = re.sub(r'{%\s*VERSION\s*%}', current_version, content)
-
-        if not os.path.exists(os.path.join(self.root_dir, '.lily')):
-            os.mkdir(os.path.join(self.root_dir, '.lily'))
+            content = re.sub(r'{%\s*VERSION\s*%}', config.version, content)
 
         makefile_path = os.path.join(
             self.root_dir, '.lily', 'lily_assistant.makefile')
@@ -66,3 +68,17 @@ class Copier:
             'copied lily_assistant makefile to {makefile_path}'.format(
                 makefile_path=makefile_path),
             fg='blue')
+
+    @property
+    def base_makefile_path(self):
+
+        return os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            'base.makefile')
+
+    @property
+    def base_hooks_path(self):
+
+        return os.path.join(
+            os.path.dirname(os.path.abspath(__file__)),
+            'hooks')

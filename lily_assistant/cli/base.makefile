@@ -43,8 +43,8 @@ assert_test_setup_was_run:
 lint:  ## lint the {% SRC_DIR %} & tests
 	printf "\n>> [CHECKER] check if code fulfills quality criteria\n" && \
 	source env.sh && \
-	flake8 --ignore D100,D101,D102,D103,D104,D105,D106,D107,D202,D204,W504 tests && \
-	flake8 --ignore D100,D101,D102,D103,D104,D105,D106,D107,D202,D204,W504 {% SRC_DIR %}
+	flake8 --ignore D100,D101,D102,D103,D104,D105,D106,D107,D202,D204,W504,W606 tests && \
+	flake8 --ignore D100,D101,D102,D103,D104,D105,D106,D107,D202,D204,W504,W606 {% SRC_DIR %}
 
 
 #
@@ -83,3 +83,19 @@ inspect_coverage: test_all  ## render html coverage report and jump to it
 	then google-chrome coverage_html/index.html; \
 	else open coverage_html/index.html; \
 	fi
+
+
+#
+# VERSION CONTROL
+#
+upgrade_version_patch:  ## upgrade version by patch 0.0.X
+	source env.sh && \
+	lily_assistant upgrade_version PATCH
+
+upgrade_version_minor:  ## upgrade version by minor 0.X.0
+	source env.sh && \
+	lily_assistant upgrade_version MINOR
+
+upgrade_version_major:  ## upgrade version by major X.0.0
+	source env.sh && \
+	lily_assistant upgrade_version MAJOR

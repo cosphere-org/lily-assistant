@@ -1,38 +1,50 @@
 
+import json
 import os
-import setuptools
-from lily_assistant import __version__
+from setuptools import setup, find_packages
 
 
-requirements_path = os.path.join(
-    os.path.dirname(os.path.realpath(__file__)), 'requirements.txt')
+BASE_DIR = os.path.dirname(os.path.realpath(__file__))
 
 
+#
+# REQUIREMENTS
+#
 def parse_requirements(requirements):
 
     return [
         r.strip()
         for r in requirements
-        if not r.strip().startswith('#') and r.strip()
+        if (
+            not r.strip().startswith('#') and
+            not r.strip().startswith('-e') and
+            r.strip())
     ]
 
 
-requirements = []
-with open(requirements_path) as f:
-    requirements.extend(parse_requirements(f.readlines()))
+with open(os.path.join(BASE_DIR, 'requirements.txt')) as f:
+    requirements = parse_requirements(f.readlines())
+
+
+#
+# CONFIG
+#
+with open(os.path.join(BASE_DIR, '.lily', 'config.json')) as f:
+    config = json.loads(f.read())
 
 
 # -- SETUP
-setuptools.setup(
-    name='lily-assistant',
-    version=__version__,
-    author='CoSphere Team',
+setup(
+    name=config['name'],
     description='Lily compatible code quality checking tool',
-    url='https://github.com/cosphere-org/lily-assistant.git',
+    url=config['repository'],
+    version=config['version'],
+    author='CoSphere Team',
+    packages=find_packages(),
     install_requires=requirements,
-    packages=setuptools.find_packages(),
+    package_data={'': ['requirements.txt']},
+    include_package_data=True,
     entry_points='''
         [console_scripts]
         lily_assistant=lily_assistant.cli.cli:cli
-    '''
-)
+    ''')

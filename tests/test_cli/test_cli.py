@@ -7,12 +7,41 @@ import textwrap
 from click.testing import CliRunner
 import pytest
 
+from lily_assistant.checkers.commit_message import CommitMessageChecker
+from lily_assistant.checkers.repo import GitRepo
+from lily_assistant.checkers.structure import StructureChecker
 from lily_assistant.cli.cli import cli
 from lily_assistant.cli.copier import Copier
-from lily_assistant.checkers.structure import StructureChecker
-from lily_assistant.checkers.repo import GitRepo
-from lily_assistant.checkers.commit_message import CommitMessageChecker
-from lily_assistant import __version__
+from lily_assistant.config import Config
+from lily_assistant.repo.repo import Repo
+from lily_assistant.repo.version import VersionRenderer
+
+
+class ConfigMock:
+
+    def __init__(self, version, last_commit_hash):
+        self._version = version
+        self._last_commit_hash = last_commit_hash
+
+    @classmethod
+    def get_config_path(cls):
+        return '/some/path/config.json'
+
+    @property
+    def version(self):
+        return self._version
+
+    @version.setter
+    def version(self, value):
+        self._version = value
+
+    @property
+    def last_commit_hash(self):
+        return self._last_commit_hash
+
+    @last_commit_hash.setter
+    def last_commit_hash(self, value):
+        self._last_commit_hash = value
 
 
 class CliTestCase(TestCase):
@@ -21,6 +50,10 @@ class CliTestCase(TestCase):
     def init_fixtures(self, mocker, tmpdir):
         self.mocker = mocker
         self.tmpdir = tmpdir
+
+        self.base_dir = tmpdir.mkdir('base')
+        self.mocker.patch.object(
+            Config, 'get_project_path').return_value = str(self.base_dir)
 
     def setUp(self):
         self.runner = CliRunner()
@@ -160,14 +193,51 @@ class CliTestCase(TestCase):
         assert result.output.strip() == ''
 
     #
-    # VERSION
+    # UPGRADE VERSION
     #
-    def test_version(self):
-        result = self.runner.invoke(cli, ['version'])
+    def test_upgrade_version__makes_the_right_calls(self):
+
+        self.mocker.patch.object(Repo, 'current_commit_hash', '222222')
+        repo_add = self.mocker.patch.object(Repo, 'add')
+        repo_commit = self.mocker.patch.object(Repo, 'commit')
+        repo_push = self.mocker.patch.object(Repo, 'push')
+        repo_tag = self.mocker.patch.object(Repo, 'tag')
+        render_next_version = self.mocker.patch.object(
+            VersionRenderer, 'render_next_version')
+        render_next_version.return_value = '1.2.13'
+
+        config = ConfigMock(
+            version='1.2.12',
+            last_commit_hash='111111')
+        self.mocker.patch(
+            'lily_assistant.cli.cli.Config',
+        ).return_value = config
+
+        result = self.runner.invoke(
+            cli, ['upgrade_version', VersionRenderer.VERSION_UPGRADE.MAJOR])
 
         assert result.exit_code == 0
         assert result.output.strip() == textwrap.dedent(f'''
             [INFO]
 
-            Lily-Assistant Version: {__version__}
+            - Version upgraded to: 1.2.13
+            - branch tagged
         ''').strip()
+
+        assert config.version == '1.2.13'
+        assert config.last_commit_hash == '222222'
+
+        assert render_next_version.call_args_list == [call('1.2.12', 'MAJOR')]
+
+        assert repo_add.call_args_list == [call('/some/path/config.json')]
+        assert repo_tag.call_args_list == [call('1.2.13')]
+        assert repo_commit.call_args_list == [call('VERSION: 1.2.13')]
+        assert repo_push.call_args_list == [call()]
+
+    def test_upgrade_version__invalid_upgrade_type(self):
+
+        result = self.runner.invoke(
+            cli, ['upgrade_version', 'NOT_MAJOR'])
+
+        assert result.exit_code == 2
+        assert 'Invalid value for "upgrade_type"' in result.output

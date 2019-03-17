@@ -1,7 +1,8 @@
 
 
 class CommitMessageChecker:
-    """
+    """Check commit message.
+
     Placeholder for upcoming checker which will be asserting if commit
     message asserts to the specifications defined here:
     https://github.com/angular/angular.js/blob/master/DEVELOPERS.md#-git-commit-guidelines
