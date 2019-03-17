@@ -82,6 +82,22 @@ class ConfigTestCase(TestCase):
             'version': '... PUT HERE INITIAL VERSION ...',
         }
 
+    def test_create_empty__lily_folder_does_not_exist(self):
+
+        self.tmpdir.join('.lily').remove()
+
+        Config.create_empty('some_service')
+
+        assert json.loads(
+            self.tmpdir.join('.lily').join('config.json').read()
+        ) == {
+            'last_commit_hash': '... THIS WILL BE FILLED AUTOMATICALLY ...',
+            'name': '... PUT HERE NAME OF YOUR PROJECT ...',
+            'repository': '... PUT HERE URL OF REPOSITORY ...',
+            'src_dir': 'some_service',
+            'version': '... PUT HERE INITIAL VERSION ...',
+        }
+
     #
     # PROPERTIES: GETTERS & SETTERS
     #

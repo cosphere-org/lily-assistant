@@ -27,6 +27,9 @@ class Config:
 
     @classmethod
     def create_empty(cls, src_dir):
+        if not os.path.exists(cls.get_lily_path()):
+            os.mkdir(cls.get_lily_path())
+
         with open(cls.get_config_path(), 'w') as f:
             f.write(
                 json.dumps(
