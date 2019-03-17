@@ -92,7 +92,7 @@ def is_not_master():
 @click.command()
 @click.argument('commit_msg_path')
 def is_commit_message_valid(commit_msg_path):
-    """Check if commit message is follows standards."""
+    """Check if commit message follows standards."""
 
     with open(commit_msg_path) as f:
         message = f.read()

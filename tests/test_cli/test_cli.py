@@ -86,7 +86,7 @@ class CliTestCase(TestCase):
         raise_errors = self.mocker.patch.object(
             StructureChecker, 'raise_errors')
 
-        result = self.runner.invoke(cli, ['has_correct_structure'])
+        result = self.runner.invoke(cli, ['has-correct-structure'])
 
         assert result.exit_code == 0
         assert result.output == ''
@@ -99,7 +99,7 @@ class CliTestCase(TestCase):
         raise_errors = self.mocker.patch.object(
             StructureChecker, 'raise_errors')
 
-        result = self.runner.invoke(cli, ['has_correct_structure'])
+        result = self.runner.invoke(cli, ['has-correct-structure'])
 
         assert result.exit_code == 0
         assert result.output == ''
@@ -112,7 +112,7 @@ class CliTestCase(TestCase):
 
         self.mocker.patch.object(GitRepo, 'active_branch', 'development')
 
-        result = self.runner.invoke(cli, ['is_not_master'])
+        result = self.runner.invoke(cli, ['is-not-master'])
 
         assert result.exit_code == 0
         assert result.output == ''
@@ -121,9 +121,9 @@ class CliTestCase(TestCase):
 
         self.mocker.patch.object(GitRepo, 'active_branch', 'master')
 
-        result = self.runner.invoke(cli, ['is_not_master'])
+        result = self.runner.invoke(cli, ['is-not-master'])
 
-        assert result.exit_code == -1
+        assert result.exit_code == 1
         assert result.output.strip() == textwrap.dedent('''
             [ERROR]
 
@@ -141,7 +141,7 @@ class CliTestCase(TestCase):
         commit_msg.write('hello world')
 
         result = self.runner.invoke(
-            cli, ['is_commit_message_valid', str(commit_msg)])
+            cli, ['is-commit-message-valid', str(commit_msg)])
 
         assert result.exit_code == 0
         assert result.output.strip() == textwrap.dedent('''
@@ -158,9 +158,9 @@ class CliTestCase(TestCase):
         commit_msg.write('hello world')
 
         result = self.runner.invoke(
-            cli, ['is_commit_message_valid', str(commit_msg)])
+            cli, ['is-commit-message-valid', str(commit_msg)])
 
-        assert result.exit_code == -1
+        assert result.exit_code == 1
         assert result.output.strip() == textwrap.dedent('''
             [ERROR]
 
@@ -174,9 +174,9 @@ class CliTestCase(TestCase):
 
         os.environ['VIRTUAL_ENV'] = ''
 
-        result = self.runner.invoke(cli, ['is_virtualenv'])
+        result = self.runner.invoke(cli, ['is-virtualenv'])
 
-        assert result.exit_code == -1
+        assert result.exit_code == 1
         assert result.output.strip() == textwrap.dedent('''
             [ERROR]
 
@@ -187,7 +187,7 @@ class CliTestCase(TestCase):
 
         os.environ['VIRTUAL_ENV'] = 'something'
 
-        result = self.runner.invoke(cli, ['is_virtualenv'])
+        result = self.runner.invoke(cli, ['is-virtualenv'])
 
         assert result.exit_code == 0
         assert result.output.strip() == ''
@@ -214,7 +214,7 @@ class CliTestCase(TestCase):
         ).return_value = config
 
         result = self.runner.invoke(
-            cli, ['upgrade_version', VersionRenderer.VERSION_UPGRADE.MAJOR])
+            cli, ['upgrade-version', VersionRenderer.VERSION_UPGRADE.MAJOR])
 
         assert result.exit_code == 0
         assert result.output.strip() == textwrap.dedent(f'''
@@ -237,7 +237,9 @@ class CliTestCase(TestCase):
     def test_upgrade_version__invalid_upgrade_type(self):
 
         result = self.runner.invoke(
-            cli, ['upgrade_version', 'NOT_MAJOR'])
+            cli, ['upgrade-version', 'NOT_MAJOR'])
 
         assert result.exit_code == 2
-        assert 'Invalid value for "upgrade_type"' in result.output
+        assert (
+            'invalid choice: NOT_MAJOR. '
+            '(choose from MAJOR, MINOR, PATCH)') in result.output
