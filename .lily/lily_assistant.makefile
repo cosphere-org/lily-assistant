@@ -40,11 +40,11 @@ assert_test_setup_was_run:
 # LINTER & CODE QUALITY
 #
 .PHONY: lint
-lint:  ## lint the src_dir & tests
+lint:  ## lint the lily_assistant & tests
 	printf "\n>> [CHECKER] check if code fulfills quality criteria\n" && \
 	source env.sh && \
 	flake8 --ignore D100,D101,D102,D103,D104,D105,D106,D107,D202,D204,W504,W606 tests && \
-	flake8 --ignore D100,D101,D102,D103,D104,D105,D106,D107,D202,D204,W504,W606 src_dir
+	flake8 --ignore D100,D101,D102,D103,D104,D105,D106,D107,D202,D204,W504,W606 lily_assistant
 
 
 #
@@ -90,12 +90,12 @@ inspect_coverage: test_all  ## render html coverage report and jump to it
 #
 upgrade_version_patch:  ## upgrade version by patch 0.0.X
 	source env.sh && \
-	lily_assistant upgrade_version PATCH
+	lily_assistant upgrade-version PATCH
 
 upgrade_version_minor:  ## upgrade version by minor 0.X.0
 	source env.sh && \
-	lily_assistant upgrade_version MINOR
+	lily_assistant upgrade-version MINOR
 
 upgrade_version_major:  ## upgrade version by major X.0.0
 	source env.sh && \
-	lily_assistant upgrade_version MAJOR
+	lily_assistant upgrade-version MAJOR
