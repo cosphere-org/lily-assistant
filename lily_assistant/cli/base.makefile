@@ -90,12 +90,12 @@ inspect_coverage: test_all  ## render html coverage report and jump to it
 #
 upgrade_version_patch:  ## upgrade version by patch 0.0.X
 	source env.sh && \
-	lily_assistant upgrade_version PATCH
+	lily_assistant upgrade-version PATCH
 
 upgrade_version_minor:  ## upgrade version by minor 0.X.0
 	source env.sh && \
-	lily_assistant upgrade_version MINOR
+	lily_assistant upgrade-version MINOR
 
 upgrade_version_major:  ## upgrade version by major X.0.0
 	source env.sh && \
-	lily_assistant upgrade_version MAJOR
+	lily_assistant upgrade-version MAJOR
