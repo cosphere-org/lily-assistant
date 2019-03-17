@@ -157,7 +157,7 @@ def upgrade_version(upgrade_type):
     config.last_commit_hash = repo.current_commit_hash
 
     # -- push all changed files
-    repo.add(config.path)
+    repo.add(config.get_config_path())
     repo.commit('VERSION: {}'.format(config.version))
     repo.push()
 

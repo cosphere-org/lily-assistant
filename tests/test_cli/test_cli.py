@@ -19,14 +19,13 @@ from lily_assistant.repo.version import VersionRenderer
 
 class ConfigMock:
 
-    def __init__(self, version, last_commit_hash, path):
+    def __init__(self, version, last_commit_hash):
         self._version = version
         self._last_commit_hash = last_commit_hash
-        self._path = path
 
-    @property
-    def path(self):
-        return self._path
+    @classmethod
+    def get_config_path(cls):
+        return '/some/path/config.json'
 
     @property
     def version(self):
@@ -209,8 +208,7 @@ class CliTestCase(TestCase):
 
         config = ConfigMock(
             version='1.2.12',
-            last_commit_hash='111111',
-            path='/hello/world')
+            last_commit_hash='111111')
         self.mocker.patch(
             'lily_assistant.cli.cli.Config',
         ).return_value = config
@@ -231,7 +229,7 @@ class CliTestCase(TestCase):
 
         assert render_next_version.call_args_list == [call('1.2.12', 'MAJOR')]
 
-        assert repo_add.call_args_list == [call('/hello/world')]
+        assert repo_add.call_args_list == [call('/some/path/config.json')]
         assert repo_tag.call_args_list == [call('1.2.13')]
         assert repo_commit.call_args_list == [call('VERSION: 1.2.13')]
         assert repo_push.call_args_list == [call()]
