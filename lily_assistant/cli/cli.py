@@ -7,7 +7,9 @@ from ..checkers.commit_message import CommitMessageChecker
 from ..checkers.repo import GitRepo
 from ..checkers.structure import StructureChecker
 from .logger import Logger
-from lily_assistant import __version__
+from lily_assistant.repo.repo import Repo
+from lily_assistant.repo.version import VersionRenderer
+from lily_assistant.config import Config
 
 
 logger = Logger()
@@ -37,8 +39,9 @@ def cli():
 @click.command()
 @click.argument('src_dir')
 def init(src_dir):
-    """
-    Init `Lily-Assistant`. During this operation the following will take place:
+    """Init `Lily-Assistant`.
+
+    During this operation the following will take place:
     - git hooks will be copied to `./.git/hooks`
     - `.lily/lily_assistant.makefile` will be copied to the root project
       directory.
@@ -70,7 +73,8 @@ def has_correct_structure():
 
 @click.command()
 def is_not_master():
-    """
+    """Check if one is not on master branch.
+
     Check if one is not attempting to perform certain operations directly
     against `master` branch.
 
@@ -120,12 +124,50 @@ def is_virtualenv():
 
 
 @click.command()
-def version():
-    """Get the currently installed version"""
+@click.argument('upgrade_type', type=click.Choice([
+    VersionRenderer.VERSION_UPGRADE.MAJOR,
+    VersionRenderer.VERSION_UPGRADE.MINOR,
+    VersionRenderer.VERSION_UPGRADE.PATCH,
+]))
+def upgrade_version(upgrade_type):
+    """Upgrade version of the repo in a complete sense.
 
-    logger.info('''
-        Lily-Assistant Version: {current_version}
-    '''.format(current_version=__version__))
+    Upgrade version of the repo and perform the following extra activities:
+
+    - tag branch with the version of repo
+
+    - update config.yaml file with version and last_commit_hash
+
+    - push changes to the remote
+
+    - update CHANGELOG with the compilation of messages coming from the
+      previous commit messages [TO BE ADDED]
+
+    """
+
+    config = Config()
+    repo = Repo()
+    version = VersionRenderer()
+
+    # -- version
+    config.version = version.render_next_version(
+        config.version, upgrade_type)
+
+    # -- last_commit_hash
+    config.last_commit_hash = repo.current_commit_hash
+
+    # -- push all changed files
+    repo.add(config.path)
+    repo.commit('VERSION: {}'.format(config.version))
+    repo.push()
+
+    # -- tag
+    repo.tag(config.version)
+
+    logger.info(f'''
+        - Version upgraded to: {config.version}
+        - branch tagged
+    ''')
 
 
 cli.add_command(init)
@@ -143,4 +185,4 @@ cli.add_command(is_commit_message_valid)
 cli.add_command(is_virtualenv)
 
 
-cli.add_command(version)
+cli.add_command(upgrade_version)

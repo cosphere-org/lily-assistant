@@ -117,27 +117,22 @@ class StructureCheckerTestCase(TestCase):
         base_dir.mkdir('code')
         os.chdir(str(base_dir))
 
-        try:
+        with pytest.raises(StructureChecker.BrokenStructure) as e:
             StructureChecker.find_project_name()
 
-        except StructureChecker.BrokenStructure as e:
-            text = e.args[0]
+        text = e.value.args[0]
+        expected = remove_white_chars('''
 
-            expected = remove_white_chars('''
+            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            Couldn't find main project directory
 
-                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                Couldn't find main project directory
+            Required structure:
 
-                Required structure:
+            └── <project_dir>
+                └── __init__.py
+        ''')
 
-                └── <project_dir>
-                    └── __init__.py
-            ''')
-
-            assert remove_white_chars(text) == expected
-
-        else:
-            raise AssertionError('should raise Exception')
+        assert remove_white_chars(text) == expected
 
     #
     # IS_VALID
@@ -215,37 +210,32 @@ class StructureCheckerTestCase(TestCase):
             ])
         checker.is_valid()
 
-        try:
+        with pytest.raises(checker.BrokenStructure) as e:
             checker.raise_errors()
 
-        except checker.BrokenStructure as e:
-            text = e.args[0]
+        text = e.value.args[0]
+        expected = remove_white_chars('''
 
-            expected = remove_white_chars('''
+            !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            Project Structure Errors Detected
 
-                !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-                Project Structure Errors Detected
+            REQUIRED STRUCTURE:
+            ├── code/
+            │   └── __init__.py
+            ├── tests/
+            ├── .git/
+            ├── .gitignore
+            ├── env.sh
+            ├── Makefile
+            ├── pytest.ini
+            ├── README.md
+            ├── requirements.txt
+            ├── test-requirements.txt
+            └── setup.py
 
-                REQUIRED STRUCTURE:
-                ├── code/
-                │   └── __init__.py
-                ├── tests/
-                ├── .git/
-                ├── .gitignore
-                ├── env.sh
-                ├── Makefile
-                ├── pytest.ini
-                ├── README.md
-                ├── requirements.txt
-                ├── test-requirements.txt
-                └── setup.py
+            ERRORS:
+            + Missing: `requirements.txt` file. Its purpose is: to require
+            + Missing: `images` directory. Its purpose is: to image
+        ''')
 
-                ERRORS:
-                + Missing: `requirements.txt` file. Its purpose is: to require
-                + Missing: `images` directory. Its purpose is: to image
-            ''')
-
-            assert remove_white_chars(text) == expected
-
-        else:
-            raise AssertionError('should raise Exception')
+        assert remove_white_chars(text) == expected
