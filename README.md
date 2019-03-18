@@ -1,5 +1,5 @@
 
-# Lily-Assitant
+# Lily-Assistant
 
 Set of scripts, git hooks etc. helping us to stick to the high quality standards imposed on our code, tests, documentation, and the way we work with git
 
@@ -19,7 +19,7 @@ pip install -e git+https://github.com/cosphere-org/lily-assistant.git@1.0.0#egg=
 
 ```
 
-After the installation of Lily-Assitant one should initialize it (while being in the root of one's project) by running:
+After the installation of Lily-Assistant one should initialize it (while being in the root of one's project) by running:
 
 ```bash
 lily_assistant init <name_of_src_dir>
@@ -30,13 +30,40 @@ Where naturally the `<name_of_src_dir>` should be replaced by the name of the sr
 
 The above operation will install newest git hooks (`./.git/hooks` directory) and perform so preliminary checks. Finally at the end it will info you about the necessity of adding `include .lily/lily_assistant.makefile` at the top of your Makefile.
 
-## Lily-Assitant Makefile commands
+
+## `config.json`
+
+After running `init` CLI command `lily-assistant` will create in the root of the project:
+- `.lily` fodler
+- inside which one will find `config.json` file.
+
+Config file takes the following form:
+
+```json
+{
+    "name": "lily-assistant",
+    "src_dir": "lily_assistant",
+    "repository": "https://github.com/cosphere-org/lily-assistant.git",
+    "version": "1.0.6",
+    "last_commit_hash": "f53dce5eb37d3cf77e33a9d3fbbae35bf9bb1a8d"
+}
+```
+
+It serves as a centralized placed for finding all needed meta information regarding the repository itself.
+
+Please notice that `"version"` and `"last_commit_hash"` are filled automatically by the `upgrade_version_<X>` commands covered below.
+
+## Makefile commands
 
 Lily-Assitant exposes various helpful Makefile commands:
+- `make install` - for setting up virtualenv and installing all `requirements.txt` and `text-requirements.txt`
 - `make lint` - when executed it will run the linter against the tests and source folders
 - `make test tests=<path to test directory / file>` - running selected tests
 - `make test_all` - running all tests
 - `make inspect_coverage` - loads in Chrome browser the html coverage report allowing one to find all lines that are missing coverage etc.
+- `make upgrade_version_patch` - perform PATCH (0.0.X) version update (together with git tag, git push and update of `config.json`)
+- `make upgrade_version_minor` - perform MINOR (0.X.0) version update (together with git tag, git push and update of `config.json`)
+- `make upgrade_version_major` - perform MAJOR (X.0.0) version update (together with git tag, git push and update of `config.json`)
 
 ## IDE and Testing
 
@@ -47,7 +74,6 @@ Lily-Assitant itself exposes plenty of super helpful commands. One can inspect t
 
 ```bash
 lily_assistant --help
-
 ```
 
 ## Required project structure
@@ -73,15 +99,9 @@ If one is interested in contributing to Lily-Assitant, please run the following 
 
 ```bash
 make install
-
 ```
 
 It's assumed that as per python standards the above command will be executed while being in some sort of virtualenv.
-
-## Going forward
-
-Notice that even though the current code focuses on the python it could be easily extend and applied to other programming languages like Scala. It would only require to set additional makefile.
-
 
 ## Reference
 
