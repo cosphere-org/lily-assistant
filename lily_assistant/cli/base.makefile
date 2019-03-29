@@ -77,8 +77,15 @@ test_all: test_setup lily_assistant_test_all test_teardown  ## run all available
 #
 # COVERAGE
 #
+.PHONY: lily_assistant_test_all_no_coverage_threshold
+lily_assistant_test_all_no_coverage_threshold:
+	printf "\n>> [CHECKER] check if all tests are passing\n" && \
+	source env.sh && \
+	py.test --cov={% SRC_DIR %} -r w -s -vv tests && \
+    coverage html -d coverage_html
+
 .PHONY: inspect_coverage
-inspect_coverage: test_all  ## render html coverage report and jump to it
+inspect_coverage: lily_assistant_test_all_no_coverage_threshold  ## render html coverage report and jump to it
 	if [ ! -z ${CHROME_EXISTS} ]; \
 	then google-chrome coverage_html/index.html; \
 	else open coverage_html/index.html; \
