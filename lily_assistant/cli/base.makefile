@@ -36,6 +36,14 @@ test_teardown:
 assert_test_setup_was_run:
 	printf "\n>> CHECK IF IN TEST SET UP WAS EXECUTED\n"
 
+.PHONY: upgrade_version_setup
+upgrade_version_setup:
+	printf "\n>> UPGRADE VERSION SET UP\n"
+
+.PHONY: upgrade_version_teardown
+upgrade_version_teardown:
+	printf "\n>> UPGRADE VERSION TEAR DOWN\n"
+
 #
 # LINTER & CODE QUALITY
 #
@@ -95,17 +103,29 @@ inspect_coverage: lily_assistant_test_all_no_coverage_threshold  ## render html 
 #
 # VERSION CONTROL
 #
-upgrade_version_patch:  ## upgrade version by patch 0.0.X
+.PHONY: lily_assistant_upgrade_version_patch
+lily_assistant_upgrade_version_patch:
 	source env.sh && \
 	lily_assistant upgrade-version PATCH
 
-upgrade_version_minor:  ## upgrade version by minor 0.X.0
+.PHONY: lily_assistant_upgrade_version_minor
+lily_assistant_upgrade_version_minor:
 	source env.sh && \
 	lily_assistant upgrade-version MINOR
 
-upgrade_version_major:  ## upgrade version by major X.0.0
+.PHONY: lily_assistant_upgrade_version_major
+lily_assistant_upgrade_version_major:
 	source env.sh && \
 	lily_assistant upgrade-version MAJOR
+
+.PHONE: upgrade_version_patch
+upgrade_version_patch: upgrade_version_setup lily_assistant_upgrade_version_patch upgrade_version_teardown  ## upgrade version by patch 0.0.X
+
+.PHONE: upgrade_version_minor
+upgrade_version_minor: upgrade_version_setup lily_assistant_upgrade_version_minor upgrade_version_teardown  ## upgrade version by minor 0.X.0
+
+.PHONE: upgrade_version_major
+upgrade_version_major: upgrade_version_setup lily_assistant_upgrade_version_major upgrade_version_teardown  ## upgrade version by major X.0.0
 
 
 #

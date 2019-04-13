@@ -16,9 +16,9 @@ class RepoTestCase(TestCase):
         self.mocker = mocker
         self.tmpdir = tmpdir
 
-        self.base_dir = self.tmpdir.mkdir('base')
-        self.mocker.patch.object(
-            Config, 'get_project_path').return_value = str(self.base_dir)
+        # self.base_dir = self.tmpdir.mkdir('base')
+        # self.mocker.patch.object(
+        #     Config, 'get_project_path').return_value = str(self.base_dir)
 
     #
     # GIT
@@ -107,6 +107,17 @@ class RepoTestCase(TestCase):
         assert git.call_args_list == [
             call('commit --no-verify -m "hello world"'),
         ]
+
+    def test_all_changes_commited(self):
+        # git = self.mocker.patch.object(Repo, 'git')
+        # 'M  lily_assistant/cli/base.makefile\n M lily_assistant/cli/cli.py\n M lily_assistant/repo/repo.py\n M lily_assistant/repo/version.py\n M tests/test_cli/test_cli.py\n M tests/test_repo/test_repo.py\n M tests/test_repo/test_version.py'
+        r = Repo()
+
+        r.all_changes_commited()
+
+        # assert git.call_args_list == [
+        #     call('commit --no-verify -m "hello world"'),
+        # ]
 
     def test_git(self):
         execute = self.mocker.patch.object(Repo, 'execute')

@@ -214,7 +214,8 @@ class CliTestCase(TestCase):
         ).return_value = config
 
         result = self.runner.invoke(
-            cli, ['upgrade-version', VersionRenderer.VERSION_UPGRADE.MAJOR])
+            cli,
+            ['upgrade-version', VersionRenderer.VERSION_UPGRADE.MAJOR.value])
 
         assert result.exit_code == 0
         assert result.output.strip() == textwrap.dedent(f'''

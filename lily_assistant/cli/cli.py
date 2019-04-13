@@ -125,9 +125,7 @@ def is_virtualenv():
 
 @click.command()
 @click.argument('upgrade_type', type=click.Choice([
-    VersionRenderer.VERSION_UPGRADE.MAJOR,
-    VersionRenderer.VERSION_UPGRADE.MINOR,
-    VersionRenderer.VERSION_UPGRADE.PATCH,
+    v.value for v in VersionRenderer.VERSION_UPGRADE
 ]))
 def upgrade_version(upgrade_type):
     """Upgrade version of the repo in a complete sense.
@@ -149,6 +147,12 @@ def upgrade_version(upgrade_type):
     repo = Repo()
     version = VersionRenderer()
 
+    # FIXME: test it!!!!
+    if not repo.all_changes_commited():
+        raise click.ClickException(
+            'Not all changes were commited! One cannot upgrade version with '
+            'some changes still being not commited')
+
     # -- version
     config.version = version.render_next_version(
         config.version, upgrade_type)
@@ -157,7 +161,8 @@ def upgrade_version(upgrade_type):
     config.last_commit_hash = repo.current_commit_hash
 
     # -- push all changed files
-    repo.add(config.get_config_path())
+    # FIXME: test it!!!!
+    repo.add_all()
     repo.commit('VERSION: {}'.format(config.version))
     repo.push()
 

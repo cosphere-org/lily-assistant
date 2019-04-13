@@ -55,6 +55,12 @@ class Repo:
     def commit(self, message):
         self.git(f'commit --no-verify -m "{message}"')
 
+    # FIXME: test it!!!!
+    def all_changes_commited(self):
+        import ipdb
+        ipdb.set_trace()
+        return bool(self.git('status --porcelain').strip())
+
     def git(self, command):
         return self.execute(f'git {command}')
 
