@@ -2,6 +2,6 @@
     "name": "lily-assistant",
     "src_dir": "lily_assistant",
     "repository": "https://github.com/cosphere-org/lily-assistant.git",
-    "version": "1.1.0",
-    "last_commit_hash": "ff6b84b6ee1ec215a7e37532a19c7c80ca1b1d8e"
+    "version": "1.1.1",
+    "last_commit_hash": "76c3576057c968ef0d47edde4961614b94ad851c"
 }
