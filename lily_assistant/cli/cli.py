@@ -147,7 +147,6 @@ def upgrade_version(upgrade_type):
     repo = Repo()
     version = VersionRenderer()
 
-    # FIXME: test it!!!!
     if not repo.all_changes_commited():
         raise click.ClickException(
             'Not all changes were commited! One cannot upgrade version with '
@@ -161,7 +160,6 @@ def upgrade_version(upgrade_type):
     config.last_commit_hash = repo.current_commit_hash
 
     # -- push all changed files
-    # FIXME: test it!!!!
     repo.add_all()
     repo.commit('VERSION: {}'.format(config.version))
     repo.push()

@@ -19,9 +19,19 @@ CHROME_EXISTS := $(shell command -v google-chrome)
 TEST_COVERAGE_THRESHOLD := 90
 
 #
+# LINTER & CODE QUALITY
+#
+.PHONY: lint
+lint:  ## lint the {% SRC_DIR %} & tests
+	printf "\n>> [CHECKER] check if code fulfills quality criteria\n" && \
+	source env.sh && \
+	flake8 --ignore D100,D101,D102,D103,D104,D105,D106,D107,D202,D204,W504,W606 tests && \
+	flake8 --ignore D100,D101,D102,D103,D104,D105,D106,D107,D202,D204,W504,W606 {% SRC_DIR %}
+
+#
 # TEST LIFECYCLE TARGETS
 #
-# NOTE: Currently those targets are only here as place-holders for
+# NOTE: Those targets are only here as place-holders for
 # overwrites which will be run pre and post various test targets. See below.
 #
 .PHONY: test_setup
@@ -35,24 +45,6 @@ test_teardown:
 .PHONY: assert_test_setup_was_run
 assert_test_setup_was_run:
 	printf "\n>> CHECK IF IN TEST SET UP WAS EXECUTED\n"
-
-.PHONY: upgrade_version_setup
-upgrade_version_setup:
-	printf "\n>> UPGRADE VERSION SET UP\n"
-
-.PHONY: upgrade_version_teardown
-upgrade_version_teardown:
-	printf "\n>> UPGRADE VERSION TEAR DOWN\n"
-
-#
-# LINTER & CODE QUALITY
-#
-.PHONY: lint
-lint:  ## lint the {% SRC_DIR %} & tests
-	printf "\n>> [CHECKER] check if code fulfills quality criteria\n" && \
-	source env.sh && \
-	flake8 --ignore D100,D101,D102,D103,D104,D105,D106,D107,D202,D204,W504,W606 tests && \
-	flake8 --ignore D100,D101,D102,D103,D104,D105,D106,D107,D202,D204,W504,W606 {% SRC_DIR %}
 
 
 #
@@ -98,6 +90,22 @@ inspect_coverage: lily_assistant_test_all_no_coverage_threshold  ## render html 
 	then google-chrome coverage_html/index.html; \
 	else open coverage_html/index.html; \
 	fi
+
+
+#
+# VERSION CONTROL LIFECYCLE
+#
+# NOTE: Those targets are only here as place-holders for
+# overwrites which will be run pre and post various version upgrade targets.
+# See below.
+#
+.PHONY: upgrade_version_setup
+upgrade_version_setup:
+	printf "\n>> UPGRADE VERSION SET UP\n"
+
+.PHONY: upgrade_version_teardown
+upgrade_version_teardown:
+	printf "\n>> UPGRADE VERSION TEAR DOWN\n"
 
 
 #
