@@ -23,6 +23,10 @@ class RepoTestCase(TestCase):
     #
     # GIT
     #
+
+    #
+    # PUSH
+    #
     def test_push(self):
         git = self.mocker.patch.object(Repo, 'git')
         git.return_value = 'feature/189-hello_world'
@@ -35,6 +39,9 @@ class RepoTestCase(TestCase):
             call('push origin feature/189-hello_world'),
         ]
 
+    #
+    # PULL
+    #
     def test_pull(self):
         git = self.mocker.patch.object(Repo, 'git')
         git.return_value = 'feature/190-hello_world'
@@ -47,6 +54,9 @@ class RepoTestCase(TestCase):
             call('pull origin feature/190-hello_world'),
         ]
 
+    #
+    # CURRENT_BRANCH
+    #
     def test_current_branch(self):
         git = self.mocker.patch.object(Repo, 'git')
         git.return_value = 'feature/cs-178-hello-world\n'
@@ -55,6 +65,9 @@ class RepoTestCase(TestCase):
         assert r.current_branch == 'feature/cs-178-hello-world'
         assert git.call_args_list == [call('rev-parse --abbrev-ref HEAD')]
 
+    #
+    # CURRENT_COMMIT_HASH
+    #
     def test_current_commit_hash(self):
         git = self.mocker.patch.object(Repo, 'git')
         git.return_value = '671ca44b704cb5d2cf6df0c74b37fabc1\n'
@@ -63,6 +76,9 @@ class RepoTestCase(TestCase):
         assert r.current_commit_hash == '671ca44b704cb5d2cf6df0c74b37fabc1'
         assert git.call_args_list == [call('rev-parse HEAD')]
 
+    #
+    # STASH
+    #
     def test_stash(self):
         git = self.mocker.patch.object(Repo, 'git')
         r = Repo()
@@ -71,6 +87,9 @@ class RepoTestCase(TestCase):
 
         assert git.call_args_list == [call('stash')]
 
+    #
+    # TAG
+    #
     def test_tag(self):
         git = self.mocker.patch.object(Repo, 'git')
         r = Repo()
@@ -82,6 +101,9 @@ class RepoTestCase(TestCase):
             call('push origin --tags'),
         ]
 
+    #
+    # ADD ALL
+    #
     def test_add_all(self):
         git = self.mocker.patch.object(Repo, 'git')
         r = Repo()
@@ -90,6 +112,9 @@ class RepoTestCase(TestCase):
 
         assert git.call_args_list == [call('add .'), call('add -u .')]
 
+    #
+    # ADD
+    #
     def test_add(self):
         git = self.mocker.patch.object(Repo, 'git')
         r = Repo()
@@ -98,6 +123,9 @@ class RepoTestCase(TestCase):
 
         assert git.call_args_list == [call('add /this/file')]
 
+    #
+    # COMMIT
+    #
     def test_commit(self):
         git = self.mocker.patch.object(Repo, 'git')
         r = Repo()
@@ -106,6 +134,47 @@ class RepoTestCase(TestCase):
 
         assert git.call_args_list == [
             call('commit --no-verify -m "hello world"'),
+        ]
+
+    #
+    # ALL_CHANGES_COMMITED
+    #
+    def test_all_changes_commited(self):
+        git = self.mocker.patch.object(Repo, 'git')
+        git.side_effect = [
+            # -- local changes
+            (
+                'M lily_assistant/cli/cli.py\n '
+                'M tests/test_repo/test_version.py'
+            ),
+
+            # -- staged changes
+            (
+                'M  lily_assistant/cli/base.makefile'
+            ),
+
+            # -- staged changes, local changes
+            (
+                'M  lily_assistant/cli/base.makefile\n '
+                'M lily_assistant/cli/cli.py\n '
+                'M tests/test_repo/test_version.py'
+            ),
+
+            # -- no changes
+            '\n\t',
+        ]
+        r = Repo()
+
+        assert r.all_changes_commited() is False
+        assert r.all_changes_commited() is False
+        assert r.all_changes_commited() is False
+        assert r.all_changes_commited() is True
+
+        assert git.call_args_list == [
+            call('status --porcelain'),
+            call('status --porcelain'),
+            call('status --porcelain'),
+            call('status --porcelain'),
         ]
 
     def test_git(self):

@@ -55,6 +55,9 @@ class Repo:
     def commit(self, message):
         self.git(f'commit --no-verify -m "{message}"')
 
+    def all_changes_commited(self):
+        return not bool(self.git('status --porcelain').strip())
+
     def git(self, command):
         return self.execute(f'git {command}')
 

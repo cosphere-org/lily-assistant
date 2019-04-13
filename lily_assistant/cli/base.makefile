@@ -19,9 +19,19 @@ CHROME_EXISTS := $(shell command -v google-chrome)
 TEST_COVERAGE_THRESHOLD := 90
 
 #
+# LINTER & CODE QUALITY
+#
+.PHONY: lint
+lint:  ## lint the {% SRC_DIR %} & tests
+	printf "\n>> [CHECKER] check if code fulfills quality criteria\n" && \
+	source env.sh && \
+	flake8 --ignore D100,D101,D102,D103,D104,D105,D106,D107,D202,D204,W504,W606 tests && \
+	flake8 --ignore D100,D101,D102,D103,D104,D105,D106,D107,D202,D204,W504,W606 {% SRC_DIR %}
+
+#
 # TEST LIFECYCLE TARGETS
 #
-# NOTE: Currently those targets are only here as place-holders for
+# NOTE: Those targets are only here as place-holders for
 # overwrites which will be run pre and post various test targets. See below.
 #
 .PHONY: test_setup
@@ -35,16 +45,6 @@ test_teardown:
 .PHONY: assert_test_setup_was_run
 assert_test_setup_was_run:
 	printf "\n>> CHECK IF IN TEST SET UP WAS EXECUTED\n"
-
-#
-# LINTER & CODE QUALITY
-#
-.PHONY: lint
-lint:  ## lint the {% SRC_DIR %} & tests
-	printf "\n>> [CHECKER] check if code fulfills quality criteria\n" && \
-	source env.sh && \
-	flake8 --ignore D100,D101,D102,D103,D104,D105,D106,D107,D202,D204,W504,W606 tests && \
-	flake8 --ignore D100,D101,D102,D103,D104,D105,D106,D107,D202,D204,W504,W606 {% SRC_DIR %}
 
 
 #
@@ -93,19 +93,47 @@ inspect_coverage: lily_assistant_test_all_no_coverage_threshold  ## render html 
 
 
 #
+# VERSION CONTROL LIFECYCLE
+#
+# NOTE: Those targets are only here as place-holders for
+# overwrites which will be run pre and post various version upgrade targets.
+# See below.
+#
+.PHONY: upgrade_version_setup
+upgrade_version_setup:
+	printf "\n>> UPGRADE VERSION SET UP\n"
+
+.PHONY: upgrade_version_teardown
+upgrade_version_teardown:
+	printf "\n>> UPGRADE VERSION TEAR DOWN\n"
+
+
+#
 # VERSION CONTROL
 #
-upgrade_version_patch:  ## upgrade version by patch 0.0.X
+.PHONY: lily_assistant_upgrade_version_patch
+lily_assistant_upgrade_version_patch:
 	source env.sh && \
 	lily_assistant upgrade-version PATCH
 
-upgrade_version_minor:  ## upgrade version by minor 0.X.0
+.PHONY: lily_assistant_upgrade_version_minor
+lily_assistant_upgrade_version_minor:
 	source env.sh && \
 	lily_assistant upgrade-version MINOR
 
-upgrade_version_major:  ## upgrade version by major X.0.0
+.PHONY: lily_assistant_upgrade_version_major
+lily_assistant_upgrade_version_major:
 	source env.sh && \
 	lily_assistant upgrade-version MAJOR
+
+.PHONE: upgrade_version_patch
+upgrade_version_patch: upgrade_version_setup lily_assistant_upgrade_version_patch upgrade_version_teardown  ## upgrade version by patch 0.0.X
+
+.PHONE: upgrade_version_minor
+upgrade_version_minor: upgrade_version_setup lily_assistant_upgrade_version_minor upgrade_version_teardown  ## upgrade version by minor 0.X.0
+
+.PHONE: upgrade_version_major
+upgrade_version_major: upgrade_version_setup lily_assistant_upgrade_version_major upgrade_version_teardown  ## upgrade version by major X.0.0
 
 
 #
