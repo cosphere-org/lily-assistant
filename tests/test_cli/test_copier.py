@@ -69,6 +69,8 @@ class CopierTestCase(TestCase):
             'repository': '... PUT HERE URL OF REPOSITORY ...',
             'src_dir': 'gigly',
             'version': '... PUT HERE INITIAL VERSION ...',
+            'next_version': None,
+            'next_last_commit_hash': None,
         }
 
     #

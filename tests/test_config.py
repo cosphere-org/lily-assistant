@@ -28,6 +28,8 @@ class ConfigTestCase(TestCase):
             'repository': 'bithub',
             'version': '0.1.9',
             'last_commit_hash': '940594',
+            'next_version': '0.2.1',
+            'next_last_commit_hash': 'fd898fd',
         }))
 
     #
@@ -80,6 +82,8 @@ class ConfigTestCase(TestCase):
             'repository': '... PUT HERE URL OF REPOSITORY ...',
             'src_dir': 'some_service',
             'version': '... PUT HERE INITIAL VERSION ...',
+            'next_version': None,
+            'next_last_commit_hash': None,
         }
 
     def test_create_empty__lily_folder_does_not_exist(self):
@@ -96,6 +100,8 @@ class ConfigTestCase(TestCase):
             'repository': '... PUT HERE URL OF REPOSITORY ...',
             'src_dir': 'some_service',
             'version': '... PUT HERE INITIAL VERSION ...',
+            'next_version': None,
+            'next_last_commit_hash': None,
         }
 
     #
@@ -111,6 +117,8 @@ class ConfigTestCase(TestCase):
         assert config.repository == 'bithub'
         assert config.version == '0.1.9'
         assert config.last_commit_hash == '940594'
+        assert config.next_version == '0.2.1'
+        assert config.next_last_commit_hash == 'fd898fd'
 
     def test_properties__setters(self):
 
@@ -125,6 +133,10 @@ class ConfigTestCase(TestCase):
         config.version = '9.9.1'
         assert read_from_conf('version') == '9.9.1'
 
+        # -- next_version
+        config.next_version = '9.0.8'
+        assert read_from_conf('next_version') == '9.0.8'
+
         # -- src_dir
         config.src_dir = 'entity_service'
         assert read_from_conf('src_dir') == 'entity_service'
@@ -132,3 +144,7 @@ class ConfigTestCase(TestCase):
         # -- last_commit_hash
         config.last_commit_hash = 'f7d87cd78'
         assert read_from_conf('last_commit_hash') == 'f7d87cd78'
+
+        # -- next_last_commit_hash
+        config.next_last_commit_hash = 'f7d87cd78'
+        assert read_from_conf('next_last_commit_hash') == 'f7d87cd78'
