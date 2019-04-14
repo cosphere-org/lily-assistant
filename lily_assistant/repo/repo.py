@@ -56,7 +56,14 @@ class Repo:
         self.git(f'commit --no-verify -m "{message}"')
 
     def all_changes_commited(self):
-        return not bool(self.git('status --porcelain').strip())
+        changed = self.git('status --porcelain').strip()
+        if changed:
+            files = changed.split('\n')
+            not_lily_changes = [f for f in files if '.lily/' not in f]
+
+            return not bool(not_lily_changes)
+
+        return True
 
     def git(self, command):
         return self.execute(f'git {command}')
