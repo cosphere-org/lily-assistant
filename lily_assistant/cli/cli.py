@@ -128,18 +128,9 @@ def is_virtualenv():
     v.value for v in VersionRenderer.VERSION_UPGRADE
 ]))
 def upgrade_version(upgrade_type):
-    """Upgrade version of the repo in a complete sense.
-
-    Upgrade version of the repo and perform the following extra activities:
-
-    - tag branch with the version of repo
+    """Upgrade version of the repo artefacts.
 
     - update config.yaml file with version and last_commit_hash
-
-    - push changes to the remote
-
-    - update CHANGELOG with the compilation of messages coming from the
-      previous commit messages [TO BE ADDED]
 
     """
 
@@ -152,14 +143,42 @@ def upgrade_version(upgrade_type):
             'Not all changes were commited! One cannot upgrade version with '
             'some changes still being not commited')
 
-    # -- version
-    config.version = version.render_next_version(
+    # -- next_version
+    config.next_version = version.render_next_version(
         config.version, upgrade_type)
 
-    # -- last_commit_hash
-    config.last_commit_hash = repo.current_commit_hash
+    # -- next_last_commit_hash
+    config.next_last_commit_hash = repo.current_commit_hash
 
-    # -- push all changed files
+    logger.info(f'''
+        - Next config version upgraded to: {config.next_version}
+    ''')
+
+
+@click.command()
+def push_upgraded_version():
+    """Push Upgraded version and all of its artefacts.
+
+    - add commit with artefacts
+
+    - tag branch with the version of repo
+
+    - push changes to the remote
+
+    """
+
+    config = Config()
+    repo = Repo()
+
+    # -- version
+    config.version = config.next_version
+    config.next_version = None
+
+    # -- last_commit_hash
+    config.last_commit_hash = config.next_last_commit_hash
+    config.next_last_commit_hash = None
+
+    # -- add all artefacts coming from the post upgrade step
     repo.add_all()
     repo.commit('VERSION: {}'.format(config.version))
     repo.push()
@@ -189,3 +208,6 @@ cli.add_command(is_virtualenv)
 
 
 cli.add_command(upgrade_version)
+
+
+cli.add_command(push_upgraded_version)

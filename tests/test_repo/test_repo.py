@@ -139,7 +139,7 @@ class RepoTestCase(TestCase):
     #
     # ALL_CHANGES_COMMITED
     #
-    def test_all_changes_commited(self):
+    def test_all_changes_commited__lily_changes(self):
         git = self.mocker.patch.object(Repo, 'git')
         git.side_effect = [
             # -- local changes
@@ -160,6 +160,17 @@ class RepoTestCase(TestCase):
                 'M tests/test_repo/test_version.py'
             ),
 
+            # -- staged changes & lily artefacts
+            (
+                'M  .lily/cli/base.makefile\n '
+                'M  lily_assistant/cli/base.makefile'
+            ),
+
+            # -- lily conf changes (artefacts)
+            (
+                'M  .lily/cli/base.makefile'
+            ),
+
             # -- no changes
             '\n\t',
         ]
@@ -168,9 +179,13 @@ class RepoTestCase(TestCase):
         assert r.all_changes_commited() is False
         assert r.all_changes_commited() is False
         assert r.all_changes_commited() is False
+        assert r.all_changes_commited() is False
+        assert r.all_changes_commited() is True
         assert r.all_changes_commited() is True
 
         assert git.call_args_list == [
+            call('status --porcelain'),
+            call('status --porcelain'),
             call('status --porcelain'),
             call('status --porcelain'),
             call('status --porcelain'),

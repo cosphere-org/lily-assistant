@@ -40,6 +40,8 @@ class Config:
                         'version': '... PUT HERE INITIAL VERSION ...',
                         'last_commit_hash': (
                             '... THIS WILL BE FILLED AUTOMATICALLY ...'),
+                        'next_version': None,
+                        'next_last_commit_hash': None,
                     },
                     indent=4,
                     sort_keys=False))
@@ -55,7 +57,9 @@ class Config:
                         'src_dir': self.src_dir,
                         'repository': self.repository,
                         'version': self.version,
+                        'next_version': self.next_version,
                         'last_commit_hash': self.last_commit_hash,
+                        'next_last_commit_hash': self.next_last_commit_hash,
                     },
                     indent=4,
                     sort_keys=False))
@@ -100,6 +104,15 @@ class Config:
         self.config['version'] = value
         self._save()
 
+    @property
+    def next_version(self):
+        return self.config.get('next_version')
+
+    @next_version.setter
+    def next_version(self, value):
+        self.config['next_version'] = value
+        self._save()
+
     #
     # LAST_COMMIT_HASH
     #
@@ -110,4 +123,13 @@ class Config:
     @last_commit_hash.setter
     def last_commit_hash(self, value):
         self.config['last_commit_hash'] = value
+        self._save()
+
+    @property
+    def next_last_commit_hash(self):
+        return self.config.get('next_last_commit_hash')
+
+    @next_last_commit_hash.setter
+    def next_last_commit_hash(self, value):
+        self.config['next_last_commit_hash'] = value
         self._save()

@@ -19,9 +19,16 @@ from lily_assistant.repo.version import VersionRenderer
 
 class ConfigMock:
 
-    def __init__(self, version, last_commit_hash):
+    def __init__(
+            self,
+            version,
+            last_commit_hash,
+            next_version=None,
+            next_last_commit_hash=None):
         self._version = version
         self._last_commit_hash = last_commit_hash
+        self._next_version = next_version
+        self._next_last_commit_hash = next_last_commit_hash
 
     @classmethod
     def get_config_path(cls):
@@ -36,12 +43,28 @@ class ConfigMock:
         self._version = value
 
     @property
+    def next_version(self):
+        return self._next_version
+
+    @next_version.setter
+    def next_version(self, value):
+        self._next_version = value
+
+    @property
     def last_commit_hash(self):
         return self._last_commit_hash
 
     @last_commit_hash.setter
     def last_commit_hash(self, value):
         self._last_commit_hash = value
+
+    @property
+    def next_last_commit_hash(self):
+        return self._next_last_commit_hash
+
+    @next_last_commit_hash.setter
+    def next_last_commit_hash(self, value):
+        self._next_last_commit_hash = value
 
 
 class CliTestCase(TestCase):
@@ -198,14 +221,10 @@ class CliTestCase(TestCase):
     def test_upgrade_version__makes_the_right_calls(self):
 
         self.mocker.patch.object(Repo, 'current_commit_hash', '222222')
-        repo_add_all = self.mocker.patch.object(Repo, 'add_all')
         self.mocker.patch.object(
             Repo,
             'all_changes_commited'
         ).return_value = True
-        repo_commit = self.mocker.patch.object(Repo, 'commit')
-        repo_push = self.mocker.patch.object(Repo, 'push')
-        repo_tag = self.mocker.patch.object(Repo, 'tag')
         render_next_version = self.mocker.patch.object(
             VersionRenderer, 'render_next_version')
         render_next_version.return_value = '1.2.13'
@@ -225,38 +244,32 @@ class CliTestCase(TestCase):
         assert result.output.strip() == textwrap.dedent(f'''
             [INFO]
 
-            - Version upgraded to: 1.2.13
-            - branch tagged
+            - Next config version upgraded to: 1.2.13
         ''').strip()
 
-        assert config.version == '1.2.13'
-        assert config.last_commit_hash == '222222'
+        assert config.version == '1.2.12'
+        assert config.last_commit_hash == '111111'
+        assert config.next_version == '1.2.13'
+        assert config.next_last_commit_hash == '222222'
 
         assert render_next_version.call_args_list == [call('1.2.12', 'MAJOR')]
-
-        assert repo_add_all.call_args_list == [call()]
-        assert repo_tag.call_args_list == [call('1.2.13')]
-        assert repo_commit.call_args_list == [call('VERSION: 1.2.13')]
-        assert repo_push.call_args_list == [call()]
 
     def test_upgrade_version__not_commited_chages(self):
 
         self.mocker.patch.object(Repo, 'current_commit_hash', '222222')
-        repo_add_all = self.mocker.patch.object(Repo, 'add_all')
         self.mocker.patch.object(
             Repo,
             'all_changes_commited'
         ).return_value = False
-        repo_commit = self.mocker.patch.object(Repo, 'commit')
-        repo_push = self.mocker.patch.object(Repo, 'push')
-        repo_tag = self.mocker.patch.object(Repo, 'tag')
         render_next_version = self.mocker.patch.object(
             VersionRenderer, 'render_next_version')
         render_next_version.return_value = '1.2.13'
 
         config = ConfigMock(
             version='1.2.12',
-            last_commit_hash='111111')
+            next_version=None,
+            last_commit_hash='111111',
+            next_last_commit_hash=None)
         self.mocker.patch(
             'lily_assistant.cli.cli.Config',
         ).return_value = config
@@ -272,14 +285,11 @@ class CliTestCase(TestCase):
 
         # -- config version and commit_hash didn't change
         assert config.version == '1.2.12'
+        assert config.next_version is None
         assert config.last_commit_hash == '111111'
+        assert config.next_last_commit_hash is None
 
         assert render_next_version.call_count == 0
-
-        assert repo_add_all.call_count == 0
-        assert repo_tag.call_count == 0
-        assert repo_commit.call_count == 0
-        assert repo_push.call_count == 0
 
     def test_upgrade_version__invalid_upgrade_type(self):
 
@@ -290,3 +300,42 @@ class CliTestCase(TestCase):
         assert (
             'invalid choice: NOT_MAJOR. '
             '(choose from MAJOR, MINOR, PATCH)') in result.output
+
+    #
+    # PUSH_UPGRADED_VERSION
+    #
+    def test_push_upgraded_version__makes_the_right_calls(self):
+
+        repo_add_all = self.mocker.patch.object(Repo, 'add_all')
+        repo_commit = self.mocker.patch.object(Repo, 'commit')
+        repo_push = self.mocker.patch.object(Repo, 'push')
+        repo_tag = self.mocker.patch.object(Repo, 'tag')
+
+        config = ConfigMock(
+            version='1.2.12',
+            next_version='1.2.13',
+            last_commit_hash='111111',
+            next_last_commit_hash='222222')
+        self.mocker.patch(
+            'lily_assistant.cli.cli.Config',
+        ).return_value = config
+
+        result = self.runner.invoke(cli, ['push-upgraded-version'])
+
+        assert result.exit_code == 0
+        assert result.output.strip() == textwrap.dedent(f'''
+            [INFO]
+
+            - Version upgraded to: 1.2.13
+            - branch tagged
+        ''').strip()
+
+        assert config.version == '1.2.13'
+        assert config.next_version is None
+        assert config.last_commit_hash == '222222'
+        assert config.next_last_commit_hash is None
+
+        assert repo_add_all.call_args_list == [call()]
+        assert repo_tag.call_args_list == [call('1.2.13')]
+        assert repo_commit.call_args_list == [call('VERSION: 1.2.13')]
+        assert repo_push.call_args_list == [call()]
