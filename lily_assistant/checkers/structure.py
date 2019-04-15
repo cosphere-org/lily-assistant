@@ -71,6 +71,7 @@ class StructureChecker:
         pass
 
     def __init__(self):
+
         self.errors = []
         self.REQUIRED_STRUCTURE = [
             File(

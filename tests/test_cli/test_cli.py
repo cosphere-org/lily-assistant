@@ -1,7 +1,7 @@
 
 import os
 from unittest import TestCase
-from unittest.mock import call
+from unittest.mock import call, Mock
 import textwrap
 
 from click.testing import CliRunner
@@ -9,7 +9,6 @@ import pytest
 
 from lily_assistant.checkers.commit_message import CommitMessageChecker
 from lily_assistant.checkers.repo import GitRepo
-from lily_assistant.checkers.structure import StructureChecker
 from lily_assistant.cli.cli import cli
 from lily_assistant.cli.copier import Copier
 from lily_assistant.config import Config
@@ -104,10 +103,12 @@ class CliTestCase(TestCase):
     #
     def test_has_correct_structure__valid(self):
 
-        self.mocker.patch.object(
-            StructureChecker, 'is_valid').return_value = True
-        raise_errors = self.mocker.patch.object(
-            StructureChecker, 'raise_errors')
+        raise_errors = Mock()
+        self.mocker.patch(
+            'lily_assistant.cli.cli.StructureChecker'
+        ).return_value = Mock(
+            is_valid=Mock(return_value=True),
+            raise_errors=raise_errors)
 
         result = self.runner.invoke(cli, ['has-correct-structure'])
 
@@ -117,10 +118,12 @@ class CliTestCase(TestCase):
 
     def test_has_correct_structure__invalid(self):
 
-        self.mocker.patch.object(
-            StructureChecker, 'is_valid').return_value = False
-        raise_errors = self.mocker.patch.object(
-            StructureChecker, 'raise_errors')
+        raise_errors = Mock()
+        self.mocker.patch(
+            'lily_assistant.cli.cli.StructureChecker'
+        ).return_value = Mock(
+            is_valid=Mock(return_value=False),
+            raise_errors=raise_errors)
 
         result = self.runner.invoke(cli, ['has-correct-structure'])
 

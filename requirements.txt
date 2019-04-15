@@ -19,3 +19,7 @@ pep8-naming>=0.7.0,<1.0
 # -- docstring convention checkers
 # ERROR CODES: http://www.pydocstyle.org/en/2.1.1/error_codes.html
 flake8-docstrings>=1.3.0,<2.0
+
+# -- test randomizer
+# DOCS: https://github.com/pytest-dev/pytest-randomly
+pytest-randomly==3.0.0
