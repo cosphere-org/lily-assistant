@@ -3,10 +3,10 @@
 Click>=7.0
 
 # -- py.test - main test framework
-pytest==4.3.1
+pytest>=4.3.1
 
 # -- code coverage
-pytest-cov==2.6.1
+pytest-cov>=2.6.1
 
 # -- python code quality checker
 # ERROR CODES: http://pycodestyle.pycqa.org/en/latest/intro.html#error-codes
