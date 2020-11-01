@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 
 import json
 import os
@@ -36,15 +37,28 @@ with open(os.path.join(BASE_DIR, '.lily', 'config.json')) as f:
 # -- SETUP
 setup(
     name=config['name'],
+    packages=find_packages(),
     description='Lily compatible code quality checking tool',
     url=config['repository'],
     version=config['version'],
     author='CoSphere Team',
-    packages=find_packages(),
+    author_email='contact@cosphere.org',
     install_requires=requirements,
-    package_data={'': ['requirements.txt']},
+    data_files=[(
+        '',
+        [
+            'requirements.txt',
+            'README.md',
+            '.lily/config.json',
+            'lily_assistant/cli/base.makefile',
+            'lily_assistant/cli/hooks/commit-msg',
+            'lily_assistant/cli/hooks/pre-commit',
+        ],
+    )],
     include_package_data=True,
     entry_points='''
         [console_scripts]
         lily_assistant=lily_assistant.cli.cli:cli
-    ''')
+    ''',
+    keywords=['lily'],
+    classifiers=[])
