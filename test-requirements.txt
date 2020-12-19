@@ -5,5 +5,8 @@ pytest-mock>=1.10.0,<2.0
 # -- enables one to point to a python path of the source code
 pytest-pythonpath>=0.7.2,<1.0
 
+# -- needed for building wheel package
+wheel>=0.36.2
+
 # -- needed for the deployment to pypi
-twine==1.13.0
+twine==3.2.0
