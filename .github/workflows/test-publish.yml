@@ -6,6 +6,7 @@ jobs:
   test-and-push:
     name: Unit Tests - working branch
     runs-on: ubuntu-latest
+    environment: production
 
     steps:
       - name: Check out repository
@@ -36,4 +37,4 @@ jobs:
         working-directory: .
         run: |
           python setup.py bdist_wheel
-          twine upload dist/*.whl
+          twine upload -u __token__ -p ${{ secrets.PYPI_LILY_ENV_API_TOKEN }} dist/*.whl
