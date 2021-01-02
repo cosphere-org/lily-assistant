@@ -244,7 +244,7 @@ class CliTestCase(TestCase):
             ['upgrade-version', VersionRenderer.VERSION_UPGRADE.MAJOR.value])
 
         assert result.exit_code == 0
-        assert result.output.strip() == textwrap.dedent(f'''
+        assert result.output.strip() == textwrap.dedent('''
             [INFO]
 
             - Next config version upgraded to: 1.2.13
@@ -326,7 +326,7 @@ class CliTestCase(TestCase):
         result = self.runner.invoke(cli, ['push-upgraded-version'])
 
         assert result.exit_code == 0
-        assert result.output.strip() == textwrap.dedent(f'''
+        assert result.output.strip() == textwrap.dedent('''
             [INFO]
 
             - Version upgraded to: 1.2.13
