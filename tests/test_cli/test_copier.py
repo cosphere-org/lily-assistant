@@ -176,7 +176,7 @@ class CopierTestCase(TestCase):
 
         result_makefile_content = (
             self.project_dir.join('.lily/lily_assistant.makefile').read())
-        assert result_makefile_content == textwrap.dedent(f'''
+        assert result_makefile_content == textwrap.dedent('''
             ## GENERATED FOR VERSION: 0.0.11
 
             lint:  ## lint the gigly & tests
