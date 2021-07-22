@@ -312,7 +312,6 @@ class CliTestCase(TestCase):
         repo_add_all = self.mocker.patch.object(Repo, 'add_all')
         repo_commit = self.mocker.patch.object(Repo, 'commit')
         repo_push = self.mocker.patch.object(Repo, 'push')
-        repo_tag = self.mocker.patch.object(Repo, 'tag')
 
         config = ConfigMock(
             version='1.2.12',
@@ -330,7 +329,6 @@ class CliTestCase(TestCase):
             [INFO]
 
             - Version upgraded to: 1.2.13
-            - branch tagged
         ''').strip()
 
         assert config.version == '1.2.13'
@@ -339,6 +337,5 @@ class CliTestCase(TestCase):
         assert config.next_last_commit_hash is None
 
         assert repo_add_all.call_args_list == [call()]
-        assert repo_tag.call_args_list == [call('1.2.13')]
         assert repo_commit.call_args_list == [call('VERSION: 1.2.13')]
         assert repo_push.call_args_list == [call()]
