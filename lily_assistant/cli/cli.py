@@ -183,12 +183,8 @@ def push_upgraded_version():
     repo.commit('VERSION: {}'.format(config.version))
     repo.push()
 
-    # -- tag
-    repo.tag(config.version)
-
     logger.info(f'''
         - Version upgraded to: {config.version}
-        - branch tagged
     ''')
 
 

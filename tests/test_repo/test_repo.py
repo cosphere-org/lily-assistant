@@ -88,20 +88,6 @@ class RepoTestCase(TestCase):
         assert git.call_args_list == [call('stash')]
 
     #
-    # TAG
-    #
-    def test_tag(self):
-        git = self.mocker.patch.object(Repo, 'git')
-        r = Repo()
-
-        r.tag('0.1.19')
-
-        assert git.call_args_list == [
-            call('tag 0.1.19'),
-            call('push origin --tags'),
-        ]
-
-    #
     # ADD ALL
     #
     def test_add_all(self):

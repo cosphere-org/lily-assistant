@@ -41,10 +41,6 @@ class Repo:
     def current_commit_hash(self):
         return self.git('rev-parse HEAD').strip()
 
-    def tag(self, version):
-        self.git(f'tag {version}')
-        self.git('push origin --tags')
-
     def add_all(self):
         self.git('add .')
         self.git('add -u .')
