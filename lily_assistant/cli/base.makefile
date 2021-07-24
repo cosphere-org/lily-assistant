@@ -148,8 +148,6 @@ upgrade_version_major: upgrade_version_setup lily_assistant_upgrade_version_majo
 #
 .PHONY: install
 install:  # generic install command for python
-	python -m venv .venv && \
-	source .venv/bin/activate && \
 	pip install -U pip && \
 	pip install -r requirements.txt && \
 	pip install -r test-requirements.txt
