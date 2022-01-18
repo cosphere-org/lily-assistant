@@ -294,15 +294,15 @@ class CliTestCase(TestCase):
 
         assert render_next_version.call_count == 0
 
-    def test_upgrade_version__invalid_upgrade_type(self):
+    # def test_upgrade_version__invalid_upgrade_type(self):
 
-        result = self.runner.invoke(
-            cli, ['upgrade-version', 'NOT_MAJOR'])
+    #     result = self.runner.invoke(
+    #         cli, ['upgrade-version', 'NOT_MAJOR'])
 
-        assert result.exit_code == 2
-        assert (
-            'invalid choice: NOT_MAJOR. '
-            '(choose from MAJOR, MINOR, PATCH)') in result.output
+    #     assert result.exit_code == 2
+    #     assert (
+    #         'invalid choice: NOT_MAJOR. '
+    #         '(choose from MAJOR, MINOR, PATCH)') in result.output
 
     #
     # PUSH_UPGRADED_VERSION
